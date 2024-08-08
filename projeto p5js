@@ -1,0 +1,272 @@
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(220);
+}let ball;
+
+let leftPaddle;
+
+let rightPaddle;
+
+let leftScore = 0;
+
+let rightScore = 0;
+
+function setup() {
+
+  createCanvas(800, 400);
+
+  ball = new Ball();
+
+  leftPaddle = new Paddle(true);
+
+  rightPaddle = new Paddle(false);
+
+}
+
+function draw() {
+
+  background(0);
+
+  
+
+  // Draw the net
+
+  for (let i = 0; i < height; i += 20) {
+
+    stroke(255);
+
+    line(width / 2, i, width / 2, i + 10);
+
+  }
+
+  
+
+  ball.update();
+
+  ball.show();
+
+  
+
+  leftPaddle.update();
+
+  leftPaddle.show();
+
+  rightPaddle.update();
+
+  rightPaddle.show();
+
+  
+
+  ball.checkPaddle(leftPaddle);
+
+  ball.checkPaddle(rightPaddle);
+
+  
+
+  // Display scores
+
+  textSize(32);
+
+  fill(255);
+
+  text(leftScore, width / 4, 50);
+
+  text(rightScore, 3 * width / 4, 50);
+
+}
+
+class Ball {
+
+  constructor() {
+
+    this.reset();
+
+  }
+
+  
+
+  reset() {
+
+    this.x = width / 2;
+
+    this.y = height / 2;
+
+    this.xSpeed = random(2) > 1 ? 5 : -5;
+
+    this.ySpeed = random(-3, 3);
+
+    this.r = 12;
+
+  }
+
+  
+
+  update() {
+
+    this.x += this.xSpeed;
+
+    this.y += this.ySpeed;
+
+    
+
+    if (this.y - this.r < 0 || this.y + this.r > height) {
+
+      this.ySpeed *= -1;
+
+    }
+    if (this.x < 0) {
+
+      rightScore++;
+
+      this.reset();
+
+    }
+
+    
+
+    if (this.x > width) {
+
+      leftScore++;
+
+      this.reset();
+
+    }
+
+  }
+
+  
+
+  show() {
+
+    fill(255);
+
+    ellipse(this.x, this.y, this.r * 2);
+
+  }
+
+  
+
+  checkPaddle(paddle) {
+
+    if (this.y > paddle.y && this.y < paddle.y + paddle.h) {
+
+      if (paddle.isLeft && this.x - this.r < paddle.x + paddle.w) {
+
+        if (this.x > paddle.x) {
+
+          this.xSpeed *= -1;
+
+          this.ySpeed += paddle.ySpeed * 0.2;
+
+          this.x = paddle.x + paddle.w + this.r;
+
+        }
+
+      } else if (!paddle.isLeft && this.x + this.r > paddle.x) {
+
+        if (this.x < paddle.x + paddle.w) {
+
+          this.xSpeed *= -1;
+
+          this.ySpeed += paddle.ySpeed * 0.2;
+
+          this.x = paddle.x - this.r;
+
+        }
+
+      }
+
+    }
+
+  }
+
+}
+
+class Paddle {
+
+  constructor(isLeft) {
+
+    this.isLeft = isLeft;
+
+    this.w = 10;
+
+    this.h = 100;
+
+    this.ySpeed = 0;
+
+    this.y = height / 2 - this.h / 2;
+
+    
+
+    if (this.isLeft) {
+
+      this.x = 0;
+
+    } else {
+
+      this.x = width - this.w;
+
+    }
+
+  }
+
+  
+
+  update() {
+
+    this.y += this.ySpeed;
+
+    this.y = constrain(this.y, 0, height - this.h);
+
+    
+
+    if (this.isLeft) {
+
+      if (keyIsDown(87)) { // 'W' key
+
+        this.ySpeed = -10;
+
+      } else if (keyIsDown(83)) { // 'S' key
+
+        this.ySpeed = 10;
+
+      } else {
+
+        this.ySpeed = 0;
+
+      }
+
+    } else {
+
+      if (keyIsDown(UP_ARROW)) {
+
+        this.ySpeed = -10;
+
+      } else if (keyIsDown(DOWN_ARROW)) {
+
+        this.ySpeed = 10;
+
+      } else {
+
+        this.ySpeed = 0;
+
+      }
+
+    }
+
+  }
+
+  
+
+  show() {
+
+    fill(255);
+
+    rect(this.x, this.y, this.w, this.h);
+
+  }
+
+}
